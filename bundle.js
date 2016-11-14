@@ -1,4 +1,3 @@
-var SRL =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -45,10 +44,431 @@ var SRL =
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	const { schema } = __webpack_require__(1);
+	const { fields } = __webpack_require__(5);
+
+	/*
+	  global $, document
+	*/
+
+	/**
+	 * Download the JSON output
+	 */
+	function download () {
+	  const str = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(this.getValue(), null, '  '))}`;
+	  const downloadLink = document.createElement('a');
+	  downloadLink.setAttribute('href', str);
+	  downloadLink.setAttribute('download', 'swagger.json');
+	  downloadLink.innerHTML = 'Download Open API specification file';
+	  downloadLink.hidden = true;
+	  document.body.appendChild(downloadLink);
+	  downloadLink.click();
+	  downloadLink.remove();
+	}
+
+	// let form;
+
+	// function jsonPreview () {
+	//   $('#json-preview').removeClass('hidden');
+	//   if (form !== undefined) {
+	//     $('#json-preview').JSONView(form);
+	//   }
+	// }
+	//
+	// function richPreview () {
+	//   $('#rich-preview').removeClass('hidden');
+	//   if (form !== undefined) {
+	//     // TODO rich preview
+	//   }
+	// }
+
+	$('#form').alpaca({
+	  schema,
+	  options: {
+	    fields,
+	    form: {
+	      buttons: {
+	        download: {
+	          click: download,
+	          type: 'button',
+	          value: 'Download as JSON',
+	          styles: 'btn btn-primary',
+	        },
+	      },
+	    },
+	  },
+	  postRender: (control) => {
+	    control.on('change', function onChange () {
+	      if (!$('#json-preview').hasClass('hidden')) {
+	        $('#json-preview').JSONView(this.getValue());
+	      } else if (!$('#rich-preview').hasClass('hidden')) {
+	        // TODO rich preview
+	      }
+	    });
+	  },
+	});
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const { paths } = __webpack_require__(2);
+	const { info } = __webpack_require__(4);
+	const { schemes, consumes, produces } = __webpack_require__(3);
+
+	exports.schema = {
+	  title: 'Open API designer',
+	  type: 'object',
+	  properties: {
+	    swagger: {
+	      type: 'string',
+	      title: 'Swagger Version',
+	      required: true,
+	      default: '2.0',
+	      enum: ['2.0'],
+	    },
+	    info,
+	    schemes,
+	    consumes,
+	    produces,
+	    paths,
+	  },
+	};
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const { schemes, consumes, produces } = __webpack_require__(3);
+
+	const parameters = {
+	  title: 'Parameters',
+	  type: 'array',
+	  items: {
+	    type: 'object',
+	    properties: {
+	      name: {
+	        title: 'Name',
+	        type: 'string',
+	        required: true,
+	      },
+	      in: {
+	        title: 'Parameter location',
+	        type: 'string',
+	        default: 'path',
+	        enum: ['query', 'header', 'path', 'formData', 'body'],
+	        required: true,
+	      },
+	      description: {
+	        title: 'Description',
+	        type: 'string',
+	      },
+	      required: {
+	        title: 'Required',
+	        type: 'boolean',
+	        required: true,
+	      },
+	    },
+	  },
+	};
+
+	const methods = {
+	  title: 'Methods',
+	  type: 'array',
+	  items: {
+	    type: 'object',
+	    properties: {
+	      _key: {
+	        title: 'Method',
+	        type: 'string',
+	        enum: ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'],
+	      },
+	      tags: {
+	        title: 'Tags',
+	        type: 'array',
+	        items: {
+	          type: 'string',
+	        },
+	      },
+	      summary: {
+	        title: 'Summary',
+	        type: 'string',
+	        maxLength: 120,
+	      },
+	      description: {
+	        title: 'Description',
+	        type: 'string',
+	      },
+	      externalDocs: {
+	        title: 'External Documentation',
+	        type: 'object',
+	        properties: {
+	          url: {
+	            title: 'URL',
+	            type: 'string',
+	            format: 'url',
+	            required: true,
+	          },
+	          description: {
+	            title: 'Description',
+	            type: 'string',
+	          },
+	        },
+	      },
+	      operationId: {
+	        title: 'Operation ID',
+	        type: 'string',
+	      },
+	      schemes,
+	      consumes,
+	      produces,
+	      parameters,
+	    },
+	  },
+	};
+
+	exports.paths = {
+	  title: 'Paths',
+	  type: 'array',
+	  items: {
+	    type: 'object',
+	    properties: {
+	      _key: {
+	        title: 'Path',
+	        type: 'string',
+	      },
+	      methods,
+	      parameters,
+	    },
+	  },
+	};
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	exports.schemes = {
+	  title: 'Schemes',
+	  type: 'array',
+	  items: {
+	    title: 'Scheme',
+	    type: 'string',
+	    enum: ['http', 'https', 'ws', 'wss'],
+	  },
+	  minItems: 1,
+	};
+
+	exports.consumes = {
+	  title: 'Consumes',
+	  type: 'array',
+	  items: {
+	    title: 'MIME type',
+	    type: 'string',
+	  },
+	  minItems: 1,
+	};
+
+	exports.produces = {
+	  title: 'Produces',
+	  type: 'array',
+	  items: {
+	    title: 'MIME type',
+	    type: 'string',
+	  },
+	  minItems: 1,
+	};
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	const contact = {
+	  title: 'Contact',
+	  type: 'object',
+	  properties: {
+	    name: {
+	      type: 'string',
+	      title: 'Name',
+	    },
+	    url: {
+	      type: 'string',
+	      format: 'url',
+	      title: 'URL',
+	    },
+	    email: {
+	      type: 'string',
+	      format: 'email',
+	      title: 'Email',
+	    },
+	  },
+	};
+
+	const license = {
+	  title: 'License',
+	  type: 'object',
+	  properties: {
+	    name: {
+	      type: 'string',
+	      title: 'Name',
+	      required: true,
+	    },
+	    url: {
+	      type: 'string',
+	      format: 'url',
+	      title: 'URL',
+	    },
+	  },
+	};
+
+	exports.info = {
+	  type: 'object',
+	  title: 'Info',
+	  properties: {
+	    title: {
+	      type: 'string',
+	      title: 'Title',
+	      required: true,
+	    },
+	    version: {
+	      type: 'string',
+	      title: 'Version',
+	      required: true,
+	    },
+	    termsOfService: {
+	      type: 'string',
+	      title: 'Terms of Service',
+	    },
+	    contact,
+	    license,
+	    host: {
+	      type: 'string',
+	      title: 'Host',
+	    },
+	    basePath: {
+	      type: 'string',
+	      title: 'Base path',
+	    },
+	  },
+	};
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const validators = __webpack_require__(6);
+
+	exports.fields = {
+	  info: {
+	    fields: {
+	      host: { validator: validators.hostname },
+	      basePath: { validator: validators.basePath },
+	    },
+	  },
+	  consumes: {
+	    items: {
+	      validator: validators.mimeType,
+	    },
+	    toolbarSticky: true,
+	  },
+	  produces: {
+	    items: {
+	      validator: validators.mimeType,
+	    },
+	    toolbarSticky: true,
+	  },
+	  paths: {
+	    type: 'map',
+	    toolbarSticky: true,
+	    items: {
+	      methods: {
+	        // This isn't working, `methods` isn't a map in the JSON output
+	        type: 'map',
+	        toolbarSticky: true,
+	      },
+	    },
+	  },
+	};
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const SRL = __webpack_require__(7);
+
+	/**
+	 * Regexes for validating fields that can't be validated using Alpaca built-in
+	 * validators.
+	 */
+	const validatorPatterns = {
+	  mimeType: new SRL(`
+	    begin with capture (
+	        any of (digit, letter) once,
+	        any of (digit, letter, one of "!#$&-^_.+") between 0 and 126 times
+	    )
+	    literally "/"
+	    capture (
+	        any of (digit, letter) once,
+	        any of (digit, letter, one of "!#$&-^_.+") between 0 and 126 times
+	    )
+	    must end, case insensitive
+	  `),
+	  hostname: new SRL(`
+	    begin with capture (
+	      capture (
+	        any of (digit, letter, one of "-") once or more,
+	        literally "." once
+	      ) never or more,
+	      any of (digit, letter, one of "-") once or more
+	    ) once,
+	    capture (
+	      literally ":" once,
+	      digit once or more
+	    ) optional,
+	    must end, case insensitive
+	  `),
+	};
+
+	/**
+	 * Alpaca validator functions to check fields using the regexes above.
+	 */
+
+	exports.mimeType = function mimeType (callback) {
+	  if (validatorPatterns.mimeType.isMatching(this.getValue())) {
+	    callback({ status: true });
+	  } else {
+	    callback({ status: false, message: 'Invalid MIME type e.g. application/vnd.github.v3.raw+json' });
+	  }
+	};
+
+	exports.hostname = function hostname (callback) {
+	  if (validatorPatterns.hostname.isMatching(this.getValue())) {
+	    callback({ status: true });
+	  } else {
+	    callback({ status: false, message: 'Invalid hostname e.g. host.example.com:80' });
+	  }
+	};
+
+	exports.basePath = function basePath () {
+	  if (!this.getValue().startsWith('/')) {
+	    this.setValue(`/${this.getValue()}`);
+	  }
+	};
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict'
 
-	const Builder = __webpack_require__(1)
-	const Interpreter = __webpack_require__(5)
+	const Builder = __webpack_require__(8)
+	const Interpreter = __webpack_require__(12)
 
 	/**
 	 * SRL facade for SRL Builder and SRL Language.
@@ -66,14 +486,14 @@ var SRL =
 
 
 /***/ },
-/* 1 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const SyntaxException = __webpack_require__(2)
-	const BuilderException = __webpack_require__(3)
-	const ImplementationException = __webpack_require__(4)
+	const SyntaxException = __webpack_require__(9)
+	const BuilderException = __webpack_require__(10)
+	const ImplementationException = __webpack_require__(11)
 
 	const NON_LITERAL_CHARACTERS = '[\\^$.|?*+()/'
 	const METHOD_TYPE_BEGIN = 0b00001
@@ -810,7 +1230,7 @@ var SRL =
 
 
 /***/ },
-/* 2 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -822,7 +1242,7 @@ var SRL =
 
 
 /***/ },
-/* 3 */
+/* 10 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -834,7 +1254,7 @@ var SRL =
 
 
 /***/ },
-/* 4 */
+/* 11 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -846,18 +1266,18 @@ var SRL =
 
 
 /***/ },
-/* 5 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Cache = __webpack_require__(6)
-	const Literally = __webpack_require__(7)
-	const parseParentheses = __webpack_require__(8)
-	const buildQuery = __webpack_require__(9)
-	const methodMatch = __webpack_require__(12)
+	const Cache = __webpack_require__(13)
+	const Literally = __webpack_require__(14)
+	const parseParentheses = __webpack_require__(15)
+	const buildQuery = __webpack_require__(16)
+	const methodMatch = __webpack_require__(19)
 
-	const InterpreterException = __webpack_require__(18)
+	const InterpreterException = __webpack_require__(25)
 
 	class Interpreter {
 	    /**
@@ -952,12 +1372,12 @@ var SRL =
 
 
 /***/ },
-/* 6 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Builder = __webpack_require__(1)
+	const Builder = __webpack_require__(8)
 	const _cache = {}
 
 	/**
@@ -999,7 +1419,7 @@ var SRL =
 
 
 /***/ },
-/* 7 */
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -1030,13 +1450,13 @@ var SRL =
 
 
 /***/ },
-/* 8 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const SyntaxException = __webpack_require__(2)
-	const Literally = __webpack_require__(7)
+	const SyntaxException = __webpack_require__(9)
+	const Literally = __webpack_require__(14)
 
 	/**
 	 * Parse parentheses and return multidimensional array containing the structure of the input string.
@@ -1188,15 +1608,15 @@ var SRL =
 
 
 /***/ },
-/* 9 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(10)
-	const Builder = __webpack_require__(1)
-	const NonCapture = __webpack_require__(11)
-	const SyntaxException = __webpack_require__(2)
+	const Method = __webpack_require__(17)
+	const Builder = __webpack_require__(8)
+	const NonCapture = __webpack_require__(18)
+	const SyntaxException = __webpack_require__(9)
 
 	/**
 	 * After the query was resolved, it can be built and thus executed.
@@ -1251,15 +1671,15 @@ var SRL =
 
 
 /***/ },
-/* 10 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const SyntaxException = __webpack_require__(2)
-	const ImplementationException = __webpack_require__(4)
+	const SyntaxException = __webpack_require__(9)
+	const ImplementationException = __webpack_require__(11)
 
-	const Literally = __webpack_require__(7)
+	const Literally = __webpack_require__(14)
 
 	class Method {
 	    /**
@@ -1343,12 +1763,12 @@ var SRL =
 
 
 /***/ },
-/* 11 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Builder = __webpack_require__(1)
+	const Builder = __webpack_require__(8)
 
 	class NonCapture extends Builder {
 	    constructor() {
@@ -1363,20 +1783,20 @@ var SRL =
 
 
 /***/ },
-/* 12 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const buildQuery = __webpack_require__(9)
-	const DefaultMethod = __webpack_require__(10)
-	const SimpleMethod = __webpack_require__(13)
-	const ToMethod = __webpack_require__(14)
-	const TimesMethod = __webpack_require__(15)
-	const AndMethod = __webpack_require__(16)
-	const AsMethod = __webpack_require__(17)
+	const buildQuery = __webpack_require__(16)
+	const DefaultMethod = __webpack_require__(17)
+	const SimpleMethod = __webpack_require__(20)
+	const ToMethod = __webpack_require__(21)
+	const TimesMethod = __webpack_require__(22)
+	const AndMethod = __webpack_require__(23)
+	const AsMethod = __webpack_require__(24)
 
-	const SyntaxException = __webpack_require__(2)
+	const SyntaxException = __webpack_require__(9)
 
 	// Unimplemented: all lazy, single line, unicode, first match
 	const mapper = {
@@ -1459,13 +1879,13 @@ var SRL =
 
 
 /***/ },
-/* 13 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(10)
-	const SyntaxException = __webpack_require__(2)
+	const Method = __webpack_require__(17)
+	const SyntaxException = __webpack_require__(9)
 
 	/**
 	 * Method having no parameters. Will throw SyntaxException if a parameter is provided.
@@ -1487,12 +1907,12 @@ var SRL =
 
 
 /***/ },
-/* 14 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(10)
+	const Method = __webpack_require__(17)
 
 	/**
 	 * Method having simple parameter(s) ignoring "to".
@@ -1515,13 +1935,13 @@ var SRL =
 
 
 /***/ },
-/* 15 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(10)
-	const SyntaxException = __webpack_require__(2)
+	const Method = __webpack_require__(17)
+	const SyntaxException = __webpack_require__(9)
 
 	/**
 	 * Method having one or two parameters. First is simple, ignoring second "time" or "times". Will throw SyntaxException if more parameters provided.
@@ -1554,12 +1974,12 @@ var SRL =
 
 
 /***/ },
-/* 16 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(10)
+	const Method = __webpack_require__(17)
 
 	/**
 	 * Method having simple parameter(s) ignoring "and" and "times".
@@ -1586,12 +2006,12 @@ var SRL =
 
 
 /***/ },
-/* 17 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(10)
+	const Method = __webpack_require__(17)
 
 	/**
 	 * Method having simple parameter(s) ignoring "as".
@@ -1618,7 +2038,7 @@ var SRL =
 
 
 /***/ },
-/* 18 */
+/* 25 */
 /***/ function(module, exports) {
 
 	'use strict'
