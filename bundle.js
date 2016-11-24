@@ -45,8 +45,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	const { schema } = __webpack_require__(1);
-	const { fields } = __webpack_require__(5);
-	const processJSON = __webpack_require__(26);
+	const { fields } = __webpack_require__(8);
+	const processJSON = __webpack_require__(29);
 	/*
 	  global $, document
 	*/
@@ -55,7 +55,9 @@
 	 * Download the JSON output
 	 */
 	function download () {
-	  const str = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(this.getValue(), null, '  '))}`;
+	  const str = `data:text/json;charset=utf-8,${
+	    encodeURIComponent(JSON.stringify(processJSON(this.getValue()), null, '  '))
+	  }`;
 	  const downloadLink = document.createElement('a');
 	  downloadLink.setAttribute('href', str);
 	  downloadLink.setAttribute('download', 'swagger.json');
@@ -118,10 +120,13 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	const { paths } = __webpack_require__(2);
-	const { info } = __webpack_require__(4);
+	const { info } = __webpack_require__(5);
+	const { tags } = __webpack_require__(6);
+	const { security, securityDefinitions } = __webpack_require__(7);
 	const { schemes, consumes, produces } = __webpack_require__(3);
+	const { externalDocs } = __webpack_require__(4);
 
-	exports.schema = {
+	const schema = {
 	  title: 'Open API designer',
 	  type: 'object',
 	  properties: {
@@ -137,8 +142,13 @@
 	    consumes,
 	    produces,
 	    paths,
+	    security,
+	    tags,
+	    externalDocs,
 	  },
 	};
+
+	module.exports = { schema };
 
 
 /***/ },
@@ -146,6 +156,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	const { schemes, consumes, produces } = __webpack_require__(3);
+	const { externalDocs } = __webpack_require__(4);
 
 	const parameters = {
 	  title: 'Parameters',
@@ -205,22 +216,7 @@
 	        title: 'Description',
 	        type: 'string',
 	      },
-	      externalDocs: {
-	        title: 'External Documentation',
-	        type: 'object',
-	        properties: {
-	          url: {
-	            title: 'URL',
-	            type: 'string',
-	            format: 'url',
-	            required: true,
-	          },
-	          description: {
-	            title: 'Description',
-	            type: 'string',
-	          },
-	        },
-	      },
+	      externalDocs,
 	      operationId: {
 	        title: 'Operation ID',
 	        type: 'string',
@@ -233,9 +229,10 @@
 	  },
 	};
 
-	exports.paths = {
+	const paths = {
 	  title: 'Paths',
 	  type: 'array',
+	  required: true,
 	  items: {
 	    type: 'object',
 	    properties: {
@@ -246,15 +243,18 @@
 	      methods,
 	      parameters,
 	    },
+	    minItems: 1,
 	  },
 	};
+
+	module.exports = { paths, methods, parameters };
 
 
 /***/ },
 /* 3 */
 /***/ function(module, exports) {
 
-	exports.schemes = {
+	const schemes = {
 	  title: 'Schemes',
 	  type: 'array',
 	  items: {
@@ -264,7 +264,7 @@
 	  },
 	};
 
-	exports.consumes = {
+	const consumes = {
 	  title: 'Consumes',
 	  type: 'array',
 	  items: {
@@ -273,7 +273,7 @@
 	  },
 	};
 
-	exports.produces = {
+	const produces = {
 	  title: 'Produces',
 	  type: 'array',
 	  items: {
@@ -282,9 +282,36 @@
 	  },
 	};
 
+	module.exports = { schemes, consumes, produces };
+
 
 /***/ },
 /* 4 */
+/***/ function(module, exports) {
+
+	const externalDocs = {
+	  title: 'External Documentation',
+	  type: 'object',
+	  required: false,
+	  properties: {
+	    url: {
+	      title: 'URL',
+	      type: 'string',
+	      format: 'url',
+	      required: true,
+	    },
+	    description: {
+	      title: 'Description',
+	      type: 'string',
+	    },
+	  },
+	};
+
+	module.exports = { externalDocs };
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports) {
 
 	const contact = {
@@ -325,7 +352,7 @@
 	  },
 	};
 
-	exports.info = {
+	const info = {
 	  type: 'object',
 	  title: 'Info',
 	  properties: {
@@ -356,14 +383,79 @@
 	  },
 	};
 
+	module.exports = { info, contact, license };
+
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	const validators = __webpack_require__(6);
+	const { externalDocs } = __webpack_require__(4);
 
-	exports.fields = {
+	const tags = {
+	  title: 'Tags',
+	  type: 'array',
+	  items: {
+	    type: 'object',
+	    properties: {
+	      name: {
+	        title: 'name',
+	        type: 'string',
+	        required: true,
+	      },
+	      description: {
+	        title: 'Description',
+	        type: 'string',
+	      },
+	      externalDocs,
+	    },
+	  },
+	};
+
+	module.exports = { tags };
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	
+	const security = {
+	  title: 'Security',
+	  type: 'array',
+	  items: {
+	    type: 'object',
+	    properties: {
+	      _key: {
+	        title: 'Name',
+	        type: 'string',
+	        required: true,
+	      },
+	      value: {
+	        title: 'Scope names',
+	        type: 'array',
+	        items: {
+	          type: 'string',
+	        },
+	      },
+	    },
+	  },
+	};
+
+	const securityDefinitions = {
+
+	};
+
+	module.exports = { security, securityDefinitions };
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const validators = __webpack_require__(9);
+
+	const fields = {
 	  info: {
 	    fields: {
 	      host: { validator: validators.hostname },
@@ -396,14 +488,25 @@
 	      },
 	    },
 	  },
+	  security: {
+	    type: 'map',
+	    toolbarSticky: true,
+	    items: {
+	      value: {
+	        toolbarSticky: true,
+	      },
+	    },
+	  },
 	};
+
+	module.exports = { fields };
 
 
 /***/ },
-/* 6 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	const SRL = __webpack_require__(7);
+	const SRL = __webpack_require__(10);
 
 	/**
 	 * Regexes for validating fields that can't be validated using Alpaca built-in
@@ -467,13 +570,13 @@
 
 
 /***/ },
-/* 7 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Builder = __webpack_require__(8)
-	const Interpreter = __webpack_require__(12)
+	const Builder = __webpack_require__(11)
+	const Interpreter = __webpack_require__(15)
 
 	/**
 	 * SRL facade for SRL Builder and SRL Language.
@@ -491,14 +594,14 @@
 
 
 /***/ },
-/* 8 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const SyntaxException = __webpack_require__(9)
-	const BuilderException = __webpack_require__(10)
-	const ImplementationException = __webpack_require__(11)
+	const SyntaxException = __webpack_require__(12)
+	const BuilderException = __webpack_require__(13)
+	const ImplementationException = __webpack_require__(14)
 
 	const NON_LITERAL_CHARACTERS = '[\\^$.|?*+()/'
 	const METHOD_TYPE_BEGIN = 0b00001
@@ -1235,7 +1338,7 @@
 
 
 /***/ },
-/* 9 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -1247,7 +1350,7 @@
 
 
 /***/ },
-/* 10 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -1259,7 +1362,7 @@
 
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -1271,18 +1374,18 @@
 
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Cache = __webpack_require__(13)
-	const Literally = __webpack_require__(14)
-	const parseParentheses = __webpack_require__(15)
-	const buildQuery = __webpack_require__(16)
-	const methodMatch = __webpack_require__(19)
+	const Cache = __webpack_require__(16)
+	const Literally = __webpack_require__(17)
+	const parseParentheses = __webpack_require__(18)
+	const buildQuery = __webpack_require__(19)
+	const methodMatch = __webpack_require__(22)
 
-	const InterpreterException = __webpack_require__(25)
+	const InterpreterException = __webpack_require__(28)
 
 	class Interpreter {
 	    /**
@@ -1377,12 +1480,12 @@
 
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Builder = __webpack_require__(8)
+	const Builder = __webpack_require__(11)
 	const _cache = {}
 
 	/**
@@ -1424,7 +1527,7 @@
 
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -1455,13 +1558,13 @@
 
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const SyntaxException = __webpack_require__(9)
-	const Literally = __webpack_require__(14)
+	const SyntaxException = __webpack_require__(12)
+	const Literally = __webpack_require__(17)
 
 	/**
 	 * Parse parentheses and return multidimensional array containing the structure of the input string.
@@ -1613,15 +1716,15 @@
 
 
 /***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(17)
-	const Builder = __webpack_require__(8)
-	const NonCapture = __webpack_require__(18)
-	const SyntaxException = __webpack_require__(9)
+	const Method = __webpack_require__(20)
+	const Builder = __webpack_require__(11)
+	const NonCapture = __webpack_require__(21)
+	const SyntaxException = __webpack_require__(12)
 
 	/**
 	 * After the query was resolved, it can be built and thus executed.
@@ -1676,15 +1779,15 @@
 
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const SyntaxException = __webpack_require__(9)
-	const ImplementationException = __webpack_require__(11)
+	const SyntaxException = __webpack_require__(12)
+	const ImplementationException = __webpack_require__(14)
 
-	const Literally = __webpack_require__(14)
+	const Literally = __webpack_require__(17)
 
 	class Method {
 	    /**
@@ -1768,12 +1871,12 @@
 
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Builder = __webpack_require__(8)
+	const Builder = __webpack_require__(11)
 
 	class NonCapture extends Builder {
 	    constructor() {
@@ -1788,20 +1891,20 @@
 
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const buildQuery = __webpack_require__(16)
-	const DefaultMethod = __webpack_require__(17)
-	const SimpleMethod = __webpack_require__(20)
-	const ToMethod = __webpack_require__(21)
-	const TimesMethod = __webpack_require__(22)
-	const AndMethod = __webpack_require__(23)
-	const AsMethod = __webpack_require__(24)
+	const buildQuery = __webpack_require__(19)
+	const DefaultMethod = __webpack_require__(20)
+	const SimpleMethod = __webpack_require__(23)
+	const ToMethod = __webpack_require__(24)
+	const TimesMethod = __webpack_require__(25)
+	const AndMethod = __webpack_require__(26)
+	const AsMethod = __webpack_require__(27)
 
-	const SyntaxException = __webpack_require__(9)
+	const SyntaxException = __webpack_require__(12)
 
 	// Unimplemented: all lazy, single line, unicode, first match
 	const mapper = {
@@ -1884,13 +1987,13 @@
 
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(17)
-	const SyntaxException = __webpack_require__(9)
+	const Method = __webpack_require__(20)
+	const SyntaxException = __webpack_require__(12)
 
 	/**
 	 * Method having no parameters. Will throw SyntaxException if a parameter is provided.
@@ -1912,12 +2015,12 @@
 
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(17)
+	const Method = __webpack_require__(20)
 
 	/**
 	 * Method having simple parameter(s) ignoring "to".
@@ -1940,13 +2043,13 @@
 
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(17)
-	const SyntaxException = __webpack_require__(9)
+	const Method = __webpack_require__(20)
+	const SyntaxException = __webpack_require__(12)
 
 	/**
 	 * Method having one or two parameters. First is simple, ignoring second "time" or "times". Will throw SyntaxException if more parameters provided.
@@ -1979,12 +2082,12 @@
 
 
 /***/ },
-/* 23 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(17)
+	const Method = __webpack_require__(20)
 
 	/**
 	 * Method having simple parameter(s) ignoring "and" and "times".
@@ -2011,12 +2114,12 @@
 
 
 /***/ },
-/* 24 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	const Method = __webpack_require__(17)
+	const Method = __webpack_require__(20)
 
 	/**
 	 * Method having simple parameter(s) ignoring "as".
@@ -2043,7 +2146,7 @@
 
 
 /***/ },
-/* 25 */
+/* 28 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -2055,42 +2158,56 @@
 
 
 /***/ },
-/* 26 */
+/* 29 */
 /***/ function(module, exports) {
 
 	
 	/**
-	 * This takes all elements in the methods array and puts them in the parent
-	 * path element with the `methodName` field as the key and the method object
-	 * as a value.
+	 *
 	 *
 	 * @param  {object} object The output from Alpaca
 	 * @return {object}        A corrected version of the output. This should be a
 	 *                         valid Swagger spec.
 	 */
-	module.exports = function processJSON (object) {
-	  if (object.paths === undefined) {
-	    return object;
-	  }
-	  Object.keys(object.paths).forEach((key) => {
-	    const path = object.paths[key];
+	module.exports = function processJSON (objectFuncParam) {
+	  const object = objectFuncParam;
+	  if (object.paths) {
+	    /*
+	     * Take all elements in the methods array and put them in the parent path
+	     * element with `methodName` as the key and the method object as the value.
+	     */
+	    Object.keys(object.paths).forEach((key) => {
+	      const path = object.paths[key];
 
-	    path.methods.forEach((method) => {
-	      const methodName = method.methodName;
-	      // Ignore if method is not set or if path already has the same method.
-	      if (methodName === undefined || {}.hasOwnProperty.call(path, methodName)) {
-	        return;
-	      }
+	      path.methods.forEach((method) => {
+	        const methodName = method.methodName;
+	        // Ignore if method is not set or if path already has the same method.
+	        if (methodName === undefined || {}.hasOwnProperty.call(path, methodName)) {
+	          return;
+	        }
 
-	      // Delete the key from the method object.
-	      const methodObj = method;
-	      delete methodObj.methodName;
-	      // Set the method object as a child of the path object.
-	      path[methodName] = method;
+	        // Delete the key from the method object.
+	        const methodObj = method;
+	        delete methodObj.methodName;
+	        // Set the method object as a child of the path object.
+	        path[methodName] = method;
+	      });
+	      // Delete the old list as it isn't actually a part of the Swagger spec
+	      delete path.methods;
 	    });
-	    // Delete the old list as it isn't actually a part of the Swagger spec
-	    delete path.methods;
-	  });
+	  } else {
+	    object.paths = {};
+	  }
+
+	  if (object.security) {
+	    /*
+	     * Put the `value` field of each security object as the actual value of the
+	     * object.
+	     */
+	    Object.keys(object.security).forEach((key) => {
+	      object.security[key] = object.security[key].value;
+	    });
+	  }
 	  return object;
 	};
 
