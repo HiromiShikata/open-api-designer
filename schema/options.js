@@ -1,6 +1,6 @@
 const validators = require('../validators');
 
-exports.fields = {
+const fields = {
   info: {
     fields: {
       host: { validator: validators.hostname },
@@ -33,4 +33,15 @@ exports.fields = {
       },
     },
   },
+  security: {
+    type: 'map',
+    toolbarSticky: true,
+    items: {
+      value: {
+        toolbarSticky: true,
+      },
+    },
+  },
 };
+
+module.exports = { fields };

@@ -1,4 +1,5 @@
 const { schemes, consumes, produces } = require('./ioinfo');
+const { externalDocs } = require('./externaldocs');
 
 const parameters = {
   title: 'Parameters',
@@ -58,22 +59,7 @@ const methods = {
         title: 'Description',
         type: 'string',
       },
-      externalDocs: {
-        title: 'External Documentation',
-        type: 'object',
-        properties: {
-          url: {
-            title: 'URL',
-            type: 'string',
-            format: 'url',
-            required: true,
-          },
-          description: {
-            title: 'Description',
-            type: 'string',
-          },
-        },
-      },
+      externalDocs,
       operationId: {
         title: 'Operation ID',
         type: 'string',
@@ -86,9 +72,10 @@ const methods = {
   },
 };
 
-exports.paths = {
+const paths = {
   title: 'Paths',
   type: 'array',
+  required: true,
   items: {
     type: 'object',
     properties: {
@@ -99,5 +86,8 @@ exports.paths = {
       methods,
       parameters,
     },
+    minItems: 1,
   },
 };
+
+module.exports = { paths, methods, parameters };
