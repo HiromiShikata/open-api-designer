@@ -49,7 +49,7 @@
 	const validators = __webpack_require__(9);
 	__webpack_require__(29);
 	/*
-	  global $, document, window, JSONEditor
+	  global $, document, window, JSONEditor, YAML
 	*/
 
 	/**
@@ -71,8 +71,11 @@
 	  process () {
 	    return processJSON(this.data);
 	  },
-	  toEncodedString () {
+	  toEncodedJSON () {
 	    return encodeURIComponent(JSON.stringify(this.process(), null, '  '));
+	  },
+	  toEncodedYAML () {
+	    return encodeURIComponent(YAML.stringify(this.process(), 99, 2));
 	  },
 	  /**
 	   * Save form data to cache (LocalStorage).
@@ -162,19 +165,34 @@
 	/**
 	 * Download the JSON output
 	 */
-	function download () {
-	  const str = `data:text/json;charset=utf-8,${form.toEncodedString()}`;
+	function download (type) {
+	  let data;
+	  if (type === 'json') {
+	    data = form.toEncodedJSON();
+	  } else if (type === 'yml') {
+	    data = form.toEncodedYAML();
+	  } else {
+	    return;
+	  }
+	  const str = `data:text/json;charset=utf-8,${data}`;
 	  const downloadLink = document.createElement('a');
 	  downloadLink.setAttribute('href', str);
-	  downloadLink.setAttribute('download', 'swagger.json');
+	  downloadLink.setAttribute('download', `swagger.${type}`);
 	  downloadLink.innerHTML = 'Download Open API specification file';
 	  downloadLink.hidden = true;
 	  document.body.appendChild(downloadLink);
 	  downloadLink.click();
 	  downloadLink.remove();
 	}
+	function clear () {
+	  delete window.localStorage.cachedForm;
+	  window.location.reload();
+	}
 
-	$('#download').click(() => download());
+	$('#download-json').click(() => download('json'));
+	$('#download-yaml').click(() => download('yml'));
+
+	$('#clear').click(() => clear());
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
