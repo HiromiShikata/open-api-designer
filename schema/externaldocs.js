@@ -1,4 +1,6 @@
+
 const externalDocs = {
+  description: 'Additional external documentation.',
   title: 'External Documentation',
   type: 'object',
   required: false,

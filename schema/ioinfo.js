@@ -1,6 +1,8 @@
+
 const schemes = {
   title: 'Schemes',
   type: 'array',
+  uniqueItems: true,
   items: {
     title: 'Scheme',
     type: 'string',
@@ -11,18 +13,22 @@ const schemes = {
 const consumes = {
   title: 'Consumes',
   type: 'array',
+  uniqueItems: true,
   items: {
     title: 'MIME type',
     type: 'string',
+    format: 'mime',
   },
 };
 
 const produces = {
   title: 'Produces',
   type: 'array',
+  uniqueItems: true,
   items: {
     title: 'MIME type',
     type: 'string',
+    format: 'mime',
   },
 };
 

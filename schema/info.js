@@ -1,3 +1,4 @@
+
 const contact = {
   title: 'Contact',
   type: 'object',
@@ -25,7 +26,7 @@ const license = {
   properties: {
     name: {
       type: 'string',
-      title: 'Name',
+      title: 'Name *',
       required: true,
     },
     url: {
@@ -42,13 +43,16 @@ const info = {
   properties: {
     title: {
       type: 'string',
-      title: 'Title',
+      title: 'Title *',
       required: true,
     },
     version: {
       type: 'string',
-      title: 'Version',
+      title: 'Version *',
       required: true,
+      options: {
+        infoText: 'The version of the API (not Swagger)',
+      },
     },
     termsOfService: {
       type: 'string',
@@ -58,7 +62,11 @@ const info = {
     license,
     host: {
       type: 'string',
+      format: 'hostname',
       title: 'Host',
+      options: {
+        infoText: 'The hostname the API is available at. Do not include protocol or base path.',
+      },
     },
     basePath: {
       type: 'string',
