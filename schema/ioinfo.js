@@ -11,6 +11,9 @@ const schemes = {
 };
 
 const consumes = {
+  alpacaOptions: {
+    toolbarSticky: true,
+  },
   title: 'Consumes',
   type: 'array',
   uniqueItems: true,
@@ -22,6 +25,9 @@ const consumes = {
 };
 
 const produces = {
+  alpacaOptions: {
+    toolbarSticky: true,
+  },
   title: 'Produces',
   type: 'array',
   uniqueItems: true,
