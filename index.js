@@ -1,9 +1,9 @@
 const schema = require('./schema/index');
 const processJSON = require('./jsonprocessor');
 const validators = require('./validators');
-require('./lib/json-editor/dist/jsoneditor.js');
+
 /*
-  global $, document, window, JSONEditor, YAML
+  global $, document, window, YAML
 */
 
 /**
@@ -48,28 +48,7 @@ const form = {
   },
 };
 
-/**
- * The current JSONEditor instance.
- * @type {JSONEditor}
- */
 let editor;
-
-// Default options for JSONEditor
-JSONEditor.defaults.options = {
-  // Use bootstrap 3 theme.
-  theme: 'bootstrap3',
-  iconlib: 'bootstrap3',
-  // Disable buttons that are not needed.
-  disable_edit_json: true,
-  disable_properties: true,
-  // Make all buttons visible by default.
-  required_by_default: true,
-  // Disable redundant delete buttons.
-  disable_array_delete_all_rows: true,
-  disable_array_delete_last_row: true,
-  show_errors: 'always',
-  custom_validators: [validators.required, validators.type],
-};
 
 /**
  * Update the JSON preview panel with the current data.
@@ -96,17 +75,19 @@ function updateJSONPreview () {
  */
 function switchSchema (sectionName) {
   $('#form').empty();
-  editor = new JSONEditor(document.getElementById('form'), {
+  global.editor = $('#form').alpaca({
     schema: JSON.parse(JSON.stringify(schema[sectionName])),
-    startval: form.data[sectionName],
+    value: form.data[sectionName],
+    postRender: (control) => {
+      control.on('change', function onChange () {
+        form.data[sectionName] = this.getValue();
+        form.save();
+        updateJSONPreview();
+      });
+    },
   });
   global.editor = editor;
   form.section = sectionName;
-  editor.on('change', () => {
-    form.data[sectionName] = editor.getValue();
-    form.save();
-    updateJSONPreview();
-  });
 }
 
 // Switch between schema sections when clicking on buttons with the data-form attribute.
