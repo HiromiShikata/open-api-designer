@@ -75,15 +75,20 @@ function updateJSONPreview () {
  */
 function switchSchema (sectionName) {
   $('#form').empty();
-  console.log(schema[sectionName]);
   global.editor = $('#form').alpaca({
     schema: JSON.parse(JSON.stringify(schema[sectionName])),
-    options: { fields: { items: {
-      name: { dependencies: { type: 'apiKey' } },
-      in: { dependencies: { type: 'apiKey' } },
-      flow: { dependencies: { type: 'oauth2' } },
-    } } },
-    value: form.data[sectionName],
+    options: { fields: { item: { fields: {
+      name: {
+        dependencies: { type: 'apiKey' },
+      },
+      in: {
+        dependencies: { type: 'apiKey' },
+      },
+      flow: {
+        dependencies: { type: 'oauth2' },
+      },
+    } } } },
+    data: form.data[sectionName],
     postRender: (control) => {
       control.on('change', function onChange () {
         form.data[sectionName] = this.getValue();
