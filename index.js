@@ -77,17 +77,7 @@ function switchSchema (sectionName) {
   $('#form').empty();
   global.editor = $('#form').alpaca({
     schema: JSON.parse(JSON.stringify(schema[sectionName])),
-    options: { fields: { item: { fields: {
-      name: {
-        dependencies: { type: 'apiKey' },
-      },
-      in: {
-        dependencies: { type: 'apiKey' },
-      },
-      flow: {
-        dependencies: { type: 'oauth2' },
-      },
-    } } } },
+    options: schema[sectionName].alpacaOptions,
     data: form.data[sectionName],
     postRender: (control) => {
       control.on('change', function onChange () {
