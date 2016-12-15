@@ -1,13 +1,13 @@
 
 const schemes = {
+  alpacaOptions: {
+    multiple: true,
+    type: 'select',
+    optionLabels: ['HTTP', 'HTTPS', 'WebSocket', 'WebSocket Secure'],
+  },
   title: 'Schemes',
   type: 'array',
-  uniqueItems: true,
-  items: {
-    title: 'Scheme',
-    type: 'string',
-    enum: ['http', 'https', 'ws', 'wss'],
-  },
+  enum: ['http', 'https', 'ws', 'wss'],
 };
 
 const consumes = {
