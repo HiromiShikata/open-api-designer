@@ -12,7 +12,7 @@ const tags = {
     type: 'object',
     properties: {
       name: {
-        title: 'Name *',
+        title: 'Name',
         type: 'string',
         required: true,
       },

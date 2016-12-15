@@ -18,12 +18,12 @@ const parameters = {
     headerTemplate: '{{ self.name }}',
     properties: {
       name: {
-        title: 'Name *',
+        title: 'Name',
         type: 'string',
         required: true,
       },
       in: {
-        title: 'Parameter location *',
+        title: 'Parameter location',
         type: 'string',
         default: 'path',
         enum: ['query', 'header', 'path', 'formData', 'body'],
@@ -34,7 +34,7 @@ const parameters = {
         type: 'string',
       },
       required: {
-        title: 'Required *',
+        title: 'Required',
         type: 'boolean',
         required: true,
       },
@@ -55,12 +55,12 @@ const responses = {
     headerTemplate: '{{ self.statusCode }}',
     properties: {
       statusCode: {
-        title: 'HTTP Status *',
+        title: 'HTTP Status',
         type: 'string',
         required: true,
       },
       description: {
-        title: 'Description *',
+        title: 'Description',
         type: 'string',
         required: true,
       },
@@ -128,7 +128,7 @@ const paths = {
     headerTemplate: 'Path {{ self.path }}',
     properties: {
       path: {
-        title: 'Path *',
+        title: 'Path',
         type: 'string',
         required: true,
       },
