@@ -34,8 +34,16 @@ const securityDefinitions = {
   items: {
     title: 'Security definition',
     type: 'object',
+    dependencies: {
+      name: ['type'],
+      in: ['type'],
+      flow: ['type'],
+      authorizationUrl: ['type', 'flow'],
+      tokenUrl: ['type', 'flow'],
+      scopes: ['type'],
+    },
     properties: {
-      choice: {
+      type: {
         title: 'Type',
         type: 'string',
         enum: ['basic', 'apiKey', 'oauth2'],
@@ -49,18 +57,12 @@ const securityDefinitions = {
         title: 'Name *',
         type: 'string',
         required: true,
-        options: {
-          infoText: 'The name of the header or query parameter to be used',
-        },
       },
       in: {
         title: 'Location of key *',
         required: true,
         type: 'string',
         enum: ['query', 'header'],
-        options: {
-          infoText: 'The location of the API key.',
-        },
       },
       flow: {
         title: 'Flow *',
