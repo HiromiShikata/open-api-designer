@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Verify .npmrc settings
+        run: |
+          grep -q "min-release-age=7" .npmrc
+          grep -q "ignore-scripts=true" .npmrc
+          grep -q "save-exact=true" .npmrc
+          grep -q "package-lock=true" .npmrc
